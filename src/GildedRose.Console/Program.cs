@@ -4,17 +4,34 @@ using System.Text.RegularExpressions;
 
 namespace GildedRose.Console
 {
-    class Program
+    public class Program
     {
         IList<Item> Items;
-        
-        IList<Regex> LegendaryItems;
-        IList<Regex> BackstagePasses;
-        IList<Regex> BetterWhenAged;
-        IList<Regex> ConjuredItems;
 
-        const int itemMinQuality = 50;
+        #region item type defintions
+        static IList<Regex> LegendaryItems = new List<Regex>()
+        {
+            new Regex(@".*(Sulfuras).*", RegexOptions.IgnoreCase)
+        };
+        static IList<Regex> BackstagePasses = new List<Regex>()
+        {
+            new Regex(@".*(Backstage passes).*", RegexOptions.IgnoreCase),
+        };
+        static IList<Regex> BetterWhenAged = new List<Regex>()
+        {
+            new Regex(@".*(Aged Brie).*", RegexOptions.IgnoreCase),
+        };
+        static IList<Regex> ConjuredItems = new List<Regex>()
+        {
+            new Regex(@".*(Conjured).*", RegexOptions.IgnoreCase),
+        };
+        #endregion
+
+        #region app constants
+        const int itemMinQuality = 0;
         const int itemMaxQuality = 50;
+        #endregion
+
         static void Main(string[] args)
         {
             System.Console.WriteLine("OMGHAI!");
@@ -35,45 +52,28 @@ namespace GildedRose.Console
                     },
                     new Item { Name = "Conjured Mana Cake", SellIn = 3, Quality = 6 }
                 },
-                LegendaryItems = new List<Regex>()
-                {
-                    new Regex(@".*(Sulfuras).*", RegexOptions.IgnoreCase)
-                },
-                BackstagePasses = new List<Regex>()
-                {
-                    new Regex(@".*(Backstage passes).*", RegexOptions.IgnoreCase),
-                },
-                BetterWhenAged = new List<Regex>()
-                {
-                    new Regex(@".*(Aged Brie).*", RegexOptions.IgnoreCase),
-                },
-                ConjuredItems = new List<Regex>() { 
-                    new Regex(@".*(Conjured).*", RegexOptions.IgnoreCase), 
-                },
             };
 
-            app.UpdateQuality(app.Items);
+            app.Items = UpdateQuality(app.Items);
 
             System.Console.ReadKey();
 
         }
 
-        public void UpdateQuality(IList<Item> itemsToUpdate)
+        public static IList<Item> UpdateQuality(IList<Item> itemsToUpdate)
         {
-            foreach (Item item in itemsToUpdate) {
+            foreach (Item item in itemsToUpdate)
+            {
                 // move a day closer to selling it
                 item.SellIn = item.SellIn - 1;
 
-                #region legendary
                 if (ItemMatchesType(item, LegendaryItems))
                 {
                     // Item is fixed quality and sellin date
                     item.SellIn = 0;
                     item.Quality = 80;
                 }
-                #endregion
 
-                #region backstagepasses
                 else if (ItemMatchesType(item, BackstagePasses))
                 {
                     // Item is worthless when event has passed
@@ -83,39 +83,33 @@ namespace GildedRose.Console
                     }
                     else
                     {
-                        item.Quality = item.Quality + IncreaseBackstageQuality(item);
-                        item.Quality = Math.Min(item.Quality, itemMaxQuality);
+                        item.Quality = IncreaseBackstageQuality(item);
                     }
                 }
-                #endregion
 
-                #region better aged
                 else if (ItemMatchesType(item, BetterWhenAged))
                 {
                     // Items age till max quality
                     item.Quality = Math.Min(item.Quality + 1, itemMaxQuality);
                 }
-                #endregion
 
-                #region conjured
                 else if (ItemMatchesType(item, ConjuredItems))
                 {
                     // Items age till max quality
                     item.Quality = Math.Max(item.Quality - 2, itemMinQuality);
                 }
-                #endregion
 
-                #region default process
                 else
                 {
-                    item.Quality = Math.Max(item.Quality - 1, itemMinQuality);
+                    item.Quality = Math.Max(item.Quality - (item.SellIn >= 0 ? 1 : 2), itemMinQuality);
                 }
-                #endregion
             }
+
+            return itemsToUpdate;
         }
 
         // Check type combination of regex and see if item is within that type
-        public Boolean ItemMatchesType (Item item, IList<Regex> TypeDefinition)
+        public static bool ItemMatchesType(Item item, IList<Regex> TypeDefinition)
         {
             foreach (Regex regex in TypeDefinition)
             {
@@ -124,25 +118,27 @@ namespace GildedRose.Console
                     return true;
                 }
             }
-            
+
             return false;
         }
 
         // Get quality modifier for backstage items
-        public int IncreaseBackstageQuality(Item item)
+        public static int IncreaseBackstageQuality(Item item)
         {
+            var amountToIncrease = 2;
+
             if (item.SellIn >= 10)
             {
-                return 1;
+                amountToIncrease = 1;
             }
 
             if (item.SellIn <= 5)
             {
-                return 3;
+                amountToIncrease = 3;
             }
 
             // when sellin is between 10 en 5
-            return 2;
+            return Math.Min(item.Quality + amountToIncrease, itemMaxQuality);
         }
     }
 
