@@ -122,9 +122,9 @@ namespace GildedRose.Tests
 
             Program.UpdateQuality(items);
 
-            Assert.Equal(items[0].Quality, 50);
+            Assert.Equal(items[0].Quality, Program.itemMaxQuality);
             Assert.Equal(items[0].SellIn, 4);
-            Assert.Equal(items[1].Quality, 50);
+            Assert.Equal(items[1].Quality, Program.itemMaxQuality);
             Assert.Equal(items[1].SellIn, -6);
         }
     }
@@ -203,7 +203,7 @@ namespace GildedRose.Tests
 
             Program.UpdateQuality(items);
 
-            Assert.Equal(items[0].Quality, 50);
+            Assert.Equal(items[0].Quality, Program.itemMaxQuality);
         }
     }
 

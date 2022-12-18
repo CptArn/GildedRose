@@ -28,8 +28,8 @@ namespace GildedRose.Console
         #endregion
 
         #region app constants
-        const int itemMinQuality = 0;
-        const int itemMaxQuality = 50;
+        public const int itemMinQuality = 0;
+        public const int itemMaxQuality = 50;
         #endregion
 
         static void Main(string[] args)
