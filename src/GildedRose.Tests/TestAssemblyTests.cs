@@ -109,12 +109,12 @@ namespace GildedRose.Tests
             {
                 new Item()
                 {
-                    Quality = 50,
+                    Quality = Program.itemMaxQuality + 5,
                     Name = "Aged Brie test item",
                     SellIn = 5,
                 },
                 new Item() {
-                    Quality = 50,
+                    Quality = Program.itemMaxQuality + 5,
                     Name = "Aged Brie test item",
                     SellIn = -5,
                 },
@@ -195,7 +195,7 @@ namespace GildedRose.Tests
             {
                 new Item()
                 {
-                    Quality = 60,
+                    Quality = Program.itemMaxQuality + 10,
                     Name = "Backstage passes 1",
                     SellIn = 4,
                 }
